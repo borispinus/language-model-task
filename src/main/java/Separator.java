@@ -1,11 +1,17 @@
 /**
  * Created by boris on 14.03.16.
  */
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Porter {
+public class Separator {
+
+    private HashMap<String,Integer> wordCount = new HashMap<String, Integer>();
 
     private static final Pattern PERFECTIVEGROUND = Pattern.compile("((ив|ивши|ившись|ыв|ывши|ывшись)|((?<=[ая])(в|вши|вшись)))$");
 
@@ -76,6 +82,36 @@ public class Porter {
         }
 
         return word;
+    }
+
+
+    private String removePM(String word){
+        return  word.replaceAll("[^\\p{L}]","");
+    }
+
+    private String removeSpaces(String word){
+        return  word.replaceAll("\\s"," ");
+    }
+
+
+
+    public void separate(String path) throws FileNotFoundException {
+        File file = new File(path);
+        Scanner scanner = new Scanner(file);
+        long amount = 0;
+        while (scanner.hasNext()){
+            String str = stem(removePM(scanner.next()));
+            if (!str.equals("")) {
+                amount++;
+                if (wordCount.containsKey(str)) {
+                    wordCount.put(str, wordCount.get(str) + 1);
+                } else {
+                    wordCount.put(str, 1);
+                }
+                System.out.println(str + " " + wordCount.get(str));
+            }
+        }
+        System.out.println(amount);
     }
 
 }
