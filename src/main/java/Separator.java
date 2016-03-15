@@ -108,8 +108,10 @@ public class Separator {
                 } else {
                     wordCount.put(str, 1);
                 }
-                System.out.println(str + " " + wordCount.get(str));
             }
+        }
+        for(String s:wordCount.keySet()){
+            System.out.println(s + " " +wordCount.get(s));
         }
         System.out.println(amount);
     }
