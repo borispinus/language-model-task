@@ -137,7 +137,6 @@ public class Separator {
                     wordArrayList.add(new Word(str, 1));
                     modelTable.put(key, wordArrayList);
                 }
-
             }
             prevs.add(str);
             if (prevs.size() > nGram - 1) {
