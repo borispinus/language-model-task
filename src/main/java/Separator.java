@@ -1,17 +1,24 @@
 /**
  * Created by boris on 14.03.16.
  */
+
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Separator {
 
-    private HashMap<String,Integer> wordCount = new HashMap<String, Integer>();
+    private HashMap<String, ArrayList<Word>> modelTable = new HashMap<String, ArrayList<Word>>();
+    private HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
+    private int amount = 0;
+    private int nGram = 2;
+
+
+    private String string;
 
     private static final Pattern PERFECTIVEGROUND = Pattern.compile("((ив|ивши|ившись|ыв|ывши|ывшись)|((?<=[ая])(в|вши|вшись)))$");
 
@@ -74,7 +81,7 @@ public class Separator {
             if (temp.equals(rv)) {
                 rv = SUPERLATIVE.matcher(rv).replaceFirst("");
                 rv = NN.matcher(rv).replaceFirst("н");
-            }else{
+            } else {
                 rv = temp;
             }
             word = pre + rv;
@@ -85,33 +92,105 @@ public class Separator {
     }
 
 
-    private String removePM(String word){
-        return  word.replaceAll("[^\\p{L}]","");
+    private String removePM(String word) {
+        return word.replaceAll("[^\\p{L}]", "");
     }
 
-    private String removeSpaces(String word){
-        return  word.replaceAll("\\s"," ");
+    private String removeSpaces(String word) {
+        return word.replaceAll("\\s", " ");
     }
 
 
-
-    public void separate(String path) throws FileNotFoundException {
+    public void separate(String path, int n) throws FileNotFoundException {
+        nGram = n;
+        ArrayList<String> prevs = new ArrayList<String>();
         File file = new File(path);
         Scanner scanner = new Scanner(file);
-        long amount = 0;
-        while (scanner.hasNext()){
-            String str = stem(removePM(scanner.next()));
+        while (scanner.hasNext()) {
+            String str = removePM(scanner.next());
             if (!str.equals("")) {
                 amount++;
-                if (wordCount.containsKey(str)) {
-                    wordCount.put(str, wordCount.get(str) + 1);
-                } else {
-                    wordCount.put(str, 1);
+                String key = "";
+                for (String word : prevs) {
+                    key += word;
                 }
-                System.out.println(str + " " + wordCount.get(str));
+                if (wordCount.containsKey(key)) {
+                    wordCount.put(key, wordCount.get(key) + 1);
+                } else {
+                    wordCount.put(key, 1);
+                }
+                if (modelTable.containsKey(key)) {
+                    boolean isContaining = false;
+                    ArrayList<Word> keyArrayList = modelTable.get(key);
+                    for (int i = 0; i < keyArrayList.size(); i++) {
+                        Word word = keyArrayList.get(i);
+                        if (word.getWord().equals(str)) {
+                            isContaining = true;
+                            word.setAmount(word.getAmount() + 1);
+                        }
+                    }
+                    if (!isContaining) {
+                        keyArrayList.add(new Word(str, 1));
+                    }
+                } else {
+                    ArrayList<Word> wordArrayList = new ArrayList<Word>();
+                    wordArrayList.add(new Word(str, 1));
+                    modelTable.put(key, wordArrayList);
+                }
+
+            }
+            prevs.add(str);
+            if (prevs.size() > nGram - 1) {
+                prevs.remove(0);
             }
         }
-        System.out.println(amount);
     }
+
+    public String insertWord(String string) {
+        Scanner scanner = new Scanner(string);
+        ArrayList<String> prevs = new ArrayList<String>();
+        while (scanner.hasNext()) {
+            String str = scanner.next().toLowerCase();
+            if (str.equals("<skip>")) {
+                String key = "";
+                for (String word : prevs) {
+                    key += word;
+                }
+                ArrayList<Word> list = modelTable.get(key);
+                Word maxWord = list.get(0);
+                for (int i = 0; i < list.size(); i++) {
+                    Word word = list.get(i);
+                    if (word.getAmount() > maxWord.getAmount()) {
+                        maxWord = word;
+                    }
+                }
+                string = string.replaceFirst("<SKIP>", maxWord.getWord());
+                System.out.println(string);
+                System.out.println((double) maxWord.getAmount()/
+                        wordCount.get(key));
+            } else {
+                prevs.add(str);
+                if (prevs.size() > nGram - 1) {
+                    prevs.remove(0);
+                }
+            }
+        }
+
+        return string;
+    }
+
+    public String getString() {
+        return string;
+    }
+
+    public void setString(String string) {
+        this.string = string;
+    }
+
+    public String continueString(String string) {
+
+        return string;
+    }
+
 
 }
