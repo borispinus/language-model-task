@@ -1,7 +1,9 @@
+import java.io.Serializable;
+
 /**
  * Created by boris on 15.03.16.
  */
-public class Word {
+public class Word implements Serializable{
     private String word;
     private int amount;
 

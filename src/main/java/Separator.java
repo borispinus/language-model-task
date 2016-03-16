@@ -2,8 +2,7 @@
  * Created by boris on 14.03.16.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -101,13 +100,13 @@ public class Separator {
     }
 
 
-    public void separate(String path, int n) throws FileNotFoundException {
+    public void buildModel(String path, String charset, String wordType, int n, int uknownWordFreq, String sPath) throws IOException {
         nGram = n;
         ArrayList<String> prevs = new ArrayList<String>();
         File file = new File(path);
-        Scanner scanner = new Scanner(file);
+        Scanner scanner = new Scanner(file, charset);
         while (scanner.hasNext()) {
-            String str = removePM(scanner.next());
+            String str = scanToken(scanner,wordType);
             if (!str.equals("")) {
                 amount++;
                 String key = "";
@@ -142,9 +141,47 @@ public class Separator {
             if (prevs.size() > nGram - 1) {
                 prevs.remove(0);
             }
+            removeRareWords(uknownWordFreq);
+            serialize(sPath);
+        }
+
+    }
+    private void serialize(String sPath) throws IOException {
+        FileOutputStream fos = new FileOutputStream(sPath);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(modelTable);
+        oos.flush();
+        oos.close();
+    }
+
+    private void removeRareWords(int freq){
+        for ( String key: wordCount.keySet()){
+            if (wordCount.get(key) < freq){
+                wordCount.remove(key);
+                modelTable.remove(key);
+            }
         }
     }
 
+    private  String scanToken(Scanner scanner, String wordType){
+        String str = "";
+        if (wordType.equals("surface_all")){
+            str = scanner.next();
+        }
+        else if (wordType.equals("surface_no_pm")){
+            str = removePM(scanner.next());
+        }
+        else  if (wordType.equals("stem")){
+            str = stem(removePM(scanner.next()));
+        }
+        else if (wordType.contains("suffix_")){
+            str = removePM(scanner.next());
+            int suffixLength = Integer.parseInt(wordType.substring(1 + wordType.indexOf(("_"))));
+            if (str.length() >= suffixLength)
+                str = str.substring(str.length() - suffixLength);
+        }
+        return str;
+    }
     public String insertWord(String string) {
         Scanner scanner = new Scanner(string);
         ArrayList<String> prevs = new ArrayList<String>();
@@ -156,17 +193,22 @@ public class Separator {
                     key += word;
                 }
                 ArrayList<Word> list = modelTable.get(key);
-                Word maxWord = list.get(0);
-                for (int i = 0; i < list.size(); i++) {
-                    Word word = list.get(i);
-                    if (word.getAmount() > maxWord.getAmount()) {
-                        maxWord = word;
+                try{
+                    Word maxWord = list.get(0);
+                    for (int i = 0; i < list.size(); i++) {
+                        Word word = list.get(i);
+                        if (word.getAmount() > maxWord.getAmount()) {
+                            maxWord = word;
+                        }
                     }
+                    string = string.replaceFirst("<SKIP>", maxWord.getWord());
+                    System.out.println(string);
+                    System.out.println((double) maxWord.getAmount()/
+                            wordCount.get(key));
                 }
-                string = string.replaceFirst("<SKIP>", maxWord.getWord());
-                System.out.println(string);
-                System.out.println((double) maxWord.getAmount()/
-                        wordCount.get(key));
+                catch(NullPointerException e){
+                    System.out.println("No matching");
+                }
             } else {
                 prevs.add(str);
                 if (prevs.size() > nGram - 1) {
