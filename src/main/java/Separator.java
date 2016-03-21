@@ -103,6 +103,7 @@ public class Separator {
 
     public void buildModel(String path, String charset, String wordType, int n, int uknownWordFreq, String sPath) throws IOException {
         long t = System.currentTimeMillis();
+        System.out.println("Start analyzing...");
 
         nGram = n;
         ArrayList<String> prevs = new ArrayList<String>();
@@ -143,6 +144,13 @@ public class Separator {
             prevs.add(str);
             if (prevs.size() > nGram - 1) {
                 prevs.remove(0);
+            }
+            if (amount % 10000 == 0) {
+                if (amount % 100000 == 0) {
+                    System.out.println(".");
+                } else {
+                    System.out.print(".");
+                }
             }
         }
         removeRareWords(uknownWordFreq);
