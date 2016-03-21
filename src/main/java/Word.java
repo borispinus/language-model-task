@@ -17,6 +17,12 @@ public class Word implements Serializable{
         return word;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        Word w = (Word) obj;
+        return this.word == w.getWord();
+    }
+
     public void setWord(String word) {
         this.word = word;
     }
