@@ -101,7 +101,7 @@ public class Separator {
     }
 
 
-    public void buildModel(String path, String charset, String wordType, int n, int uknownWordFreq, String sPath) throws IOException {
+    public void buildModel(String path, String charset, String wordType, int n, int unknownWordFreq, String sPath, String...smoothing) throws IOException {
         long t = System.currentTimeMillis();
         System.out.println("Start analyzing...");
 
@@ -110,7 +110,7 @@ public class Separator {
         File file = new File(path);
         Scanner scanner = new Scanner(file, charset);
         while (scanner.hasNext()) {
-            String str = scanToken(scanner,wordType);
+            String str = scanToken(scanner, wordType);
             if (!str.equals("")) {
                 amount++;
                 String key = "";
@@ -133,11 +133,11 @@ public class Separator {
                         }
                     }
                     if (!isContaining) {
-                        keyArrayList.add(new Word(str, 1));
+                        keyArrayList.add(new Word(1, str));
                     }
                 } else {
                     ArrayList<Word> wordArrayList = new ArrayList<Word>();
-                    wordArrayList.add(new Word(str, 1));
+                    wordArrayList.add(new Word(1, str));
                     modelTable.getModelTable().put(key, wordArrayList);
                 }
             }
@@ -153,7 +153,9 @@ public class Separator {
                 }
             }
         }
-        removeRareWords(uknownWordFreq);
+        String sm = smoothing.length > 0 ? smoothing[0] : "";
+        countP(sm);
+        removeRareWords(unknownWordFreq);
 
         System.out.print("Build model worktime: ");
         System.out.print((System.currentTimeMillis() - t));
@@ -162,28 +164,36 @@ public class Separator {
         modelTable.saveModelToFile(sPath);
     }
 
+    private void countP(String smoothing){
+            for (String key: modelTable.getModelTable().keySet()) {
+                for (Word word :modelTable.getModelTable().get(key)) {
+                    if (smoothing.equals("laplace")) {
+                        word.setP((double) (word.getAmount() + 1) / (wordCount.get(key) + wordCount.size()));
+                    } else {
+                        word.setP((double) word.getAmount() / wordCount.get(key));
+                    }
+                }
+            }
+    }
 
-    private void removeRareWords(int freq){
-        for ( String key: wordCount.keySet()){
-            if (wordCount.get(key) < freq){
+    private void removeRareWords(int freq) {
+        for (String key : wordCount.keySet()) {
+            if (wordCount.get(key) < freq) {
                 wordCount.remove(key);
                 modelTable.getModelTable().remove(key);
             }
         }
     }
 
-    private  String scanToken(Scanner scanner, String wordType){
+    private String scanToken(Scanner scanner, String wordType) {
         String str = "";
-        if (wordType.equals("surface_all")){
+        if (wordType.equals("surface_all")) {
             str = scanner.next();
-        }
-        else if (wordType.equals("surface_no_pm")){
+        } else if (wordType.equals("surface_no_pm")) {
             str = removePM(scanner.next());
-        }
-        else  if (wordType.equals("stem")){
+        } else if (wordType.equals("stem")) {
             str = stem(removePM(scanner.next()));
-        }
-        else if (wordType.contains("suffix_")){
+        } else if (wordType.contains("suffix_")) {
             str = removePM(scanner.next());
             int suffixLength = Integer.parseInt(wordType.substring(1 + wordType.indexOf(("_"))));
             if (str.length() >= suffixLength)
@@ -191,6 +201,7 @@ public class Separator {
         }
         return str;
     }
+
     public String insertWord(String string) {
         Scanner scanner = new Scanner(string);
         ArrayList<String> prevs = new ArrayList<String>();
@@ -202,20 +213,18 @@ public class Separator {
                     key += word;
                 }
                 ArrayList<Word> list = modelTable.getModelTable().get(key);
-                try{
+                try {
                     Word maxWord = list.get(0);
                     for (int i = 0; i < list.size(); i++) {
                         Word word = list.get(i);
-                        if (word.getAmount() > maxWord.getAmount()) {
+                        if (word.getP() > maxWord.getP()) {
                             maxWord = word;
                         }
                     }
                     string = string.replaceFirst("<SKIP>", maxWord.getWord());
                     System.out.println(string);
-                    System.out.println((double) maxWord.getAmount()/
-                            wordCount.get(key));
-                }
-                catch(NullPointerException e){
+                    System.out.println(maxWord.getP());
+                } catch (NullPointerException e) {
                     System.out.println("No matching");
                 }
             } else {

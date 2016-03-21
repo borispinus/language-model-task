@@ -6,10 +6,20 @@ import java.io.Serializable;
 public class Word implements Serializable{
     private String word;
     private int amount;
+    private double p;
 
-    public Word(String word, int amount) {
-        this.word = word;
+    public Word(int amount, String word) {
         this.amount = amount;
+        this.word = word;
+    }
+
+    public double getP() {
+
+        return p;
+    }
+
+    public void setP(double p) {
+        this.p = p;
     }
 
     public String getWord() {
@@ -34,4 +44,5 @@ public class Word implements Serializable{
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
 }
