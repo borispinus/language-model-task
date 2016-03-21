@@ -2,7 +2,8 @@
  * Created by boris on 14.03.16.
  */
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -11,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class Separator {
 
-    private HashMap<String, ArrayList<Word>> modelTable = new HashMap<String, ArrayList<Word>>();
+    private ModelTable modelTable = new ModelTable();
     private HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
     private int amount = 0;
     private int nGram = 2;
@@ -101,6 +102,8 @@ public class Separator {
 
 
     public void buildModel(String path, String charset, String wordType, int n, int uknownWordFreq, String sPath) throws IOException {
+        long t = System.currentTimeMillis();
+
         nGram = n;
         ArrayList<String> prevs = new ArrayList<String>();
         File file = new File(path);
@@ -118,9 +121,9 @@ public class Separator {
                 } else {
                     wordCount.put(key, 1);
                 }
-                if (modelTable.containsKey(key)) {
+                if (modelTable.getModelTable().containsKey(key)) {
                     boolean isContaining = false;
-                    ArrayList<Word> keyArrayList = modelTable.get(key);
+                    ArrayList<Word> keyArrayList = modelTable.getModelTable().get(key);
                     for (int i = 0; i < keyArrayList.size(); i++) {
                         Word word = keyArrayList.get(i);
                         if (word.getWord().equals(str)) {
@@ -134,31 +137,29 @@ public class Separator {
                 } else {
                     ArrayList<Word> wordArrayList = new ArrayList<Word>();
                     wordArrayList.add(new Word(str, 1));
-                    modelTable.put(key, wordArrayList);
+                    modelTable.getModelTable().put(key, wordArrayList);
                 }
             }
             prevs.add(str);
             if (prevs.size() > nGram - 1) {
                 prevs.remove(0);
             }
-            removeRareWords(uknownWordFreq);
-            serialize(sPath);
         }
+        removeRareWords(uknownWordFreq);
 
+        System.out.print("Build model worktime: ");
+        System.out.print((System.currentTimeMillis() - t));
+        System.out.println(" ms.");
+
+        modelTable.saveModelToFile(sPath);
     }
-    private void serialize(String sPath) throws IOException {
-        FileOutputStream fos = new FileOutputStream(sPath);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(modelTable);
-        oos.flush();
-        oos.close();
-    }
+
 
     private void removeRareWords(int freq){
         for ( String key: wordCount.keySet()){
             if (wordCount.get(key) < freq){
                 wordCount.remove(key);
-                modelTable.remove(key);
+                modelTable.getModelTable().remove(key);
             }
         }
     }
@@ -192,7 +193,7 @@ public class Separator {
                 for (String word : prevs) {
                     key += word;
                 }
-                ArrayList<Word> list = modelTable.get(key);
+                ArrayList<Word> list = modelTable.getModelTable().get(key);
                 try{
                     Word maxWord = list.get(0);
                     for (int i = 0; i < list.size(); i++) {
