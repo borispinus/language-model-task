@@ -14,7 +14,7 @@ public class Main {
             porter.buildModel("/home/cherepashka-ninja/corpus.txt", "UTF-8", "surface_no_pm", 2, 0, "/home/cherepashka-ninja/model.txt");
             System.out.println("Model builded");
             //test = new ModelTable("C:\\Users\\asus\\IdeaProjects\\language-model-task\\model.txt");
-            porter.insertWord("Серию статей об <SKIP> я начал с <SKIP>");
+            //porter.insertWord("Серию статей об <SKIP> я начал с <SKIP>");
             //System.out.println((System.currentTimeMillis()-t));
         } catch (Exception e) {
             e.printStackTrace();

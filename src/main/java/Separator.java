@@ -219,7 +219,7 @@ public class Separator {
         System.out.println(" ms.");
 
         //modelTable tester
-        Set<String> keys = modelTable.getModelTable().keySet();
+        /*Set<String> keys = modelTable.getModelTable().keySet();
         Iterator<String> itr = keys.iterator();
         int cnt = 0;
         while (itr.hasNext() && cnt < 30) {
@@ -231,7 +231,7 @@ public class Separator {
             }
             System.out.println();
             cnt++;
-        }
+        }*/
 
         modelTable.saveModelToFile(sPath);
     }
