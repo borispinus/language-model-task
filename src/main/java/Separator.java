@@ -4,9 +4,7 @@
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -202,40 +200,34 @@ public class Separator {
         return str;
     }
 
-    public String insertWord(String string) {
-        Scanner scanner = new Scanner(string);
+    public void insertWords(int n, String string) {
         ArrayList<String> prevs = new ArrayList<String>();
-        while (scanner.hasNext()) {
-            String str = scanner.next().toLowerCase();
-            if (str.equals("<skip>")) {
-                String key = "";
-                for (String word : prevs) {
-                    key += word;
-                }
-                ArrayList<Word> list = modelTable.getModelTable().get(key);
-                try {
-                    Word maxWord = list.get(0);
-                    for (int i = 0; i < list.size(); i++) {
-                        Word word = list.get(i);
-                        if (word.getP() > maxWord.getP()) {
-                            maxWord = word;
-                        }
+        for (int number = 0; number< n; number++){
+            Scanner scanner = new Scanner(string);
+            String res = string;
+            while (scanner.hasNext()) {
+                String str = scanner.next().toLowerCase();
+                if (str.equals("<skip>")) {
+                    String key = "";
+                    for (String word : prevs) {
+                        key += word;
                     }
-                    string = string.replaceFirst("<SKIP>", maxWord.getWord());
-                    System.out.println(string);
-                    System.out.println(maxWord.getP());
-                } catch (NullPointerException e) {
-                    System.out.println("No matching");
-                }
-            } else {
-                prevs.add(str);
-                if (prevs.size() > nGram - 1) {
-                    prevs.remove(0);
+                    ArrayList<Word> list = modelTable.getModelTable().get(key);
+                    try {
+                        Collections.sort(list);
+                        res = res.replaceFirst("<SKIP>", list.get(number).getWord());
+                    } catch (NullPointerException e) {
+                        res = res.replaceFirst("<SKIP>", "<NO MATCHING>");
+                    }
+                } else {
+                    prevs.add(str);
+                    if (prevs.size() > nGram - 1) {
+                        prevs.remove(0);
+                    }
                 }
             }
+            System.out.println(res);
         }
-
-        return string;
     }
 
     public String getString() {
