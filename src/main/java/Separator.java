@@ -222,7 +222,7 @@ public class Separator {
         Set<String> keys = modelTable.getModelTable().keySet();
         Iterator<String> itr = keys.iterator();
         int cnt = 0;
-        while (itr.hasNext() && cnt < 20) {
+        while (itr.hasNext() && cnt < 30) {
             String k = itr.next();
             System.out.print(k + ": ");
             ArrayList<Word> keyWords = modelTable.getModelTable().get(k);
