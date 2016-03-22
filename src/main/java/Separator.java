@@ -218,84 +218,9 @@ public class Separator {
         System.out.print((System.currentTimeMillis() - t));
         System.out.println(" ms.");
 
-        //modelTable tester
-        /*Set<String> keys = modelTable.getModelTable().keySet();
-        Iterator<String> itr = keys.iterator();
-        int cnt = 0;
-        while (itr.hasNext() && cnt < 30) {
-            String k = itr.next();
-            System.out.print(k + ": ");
-            ArrayList<Word> keyWords = modelTable.getModelTable().get(k);
-            for (Word word : keyWords) {
-                System.out.print(word.getWord() + ", ");
-            }
-            System.out.println();
-            cnt++;
-        }*/
-
         modelTable.saveModelToFile(sPath);
     }
 
-    /*public void buildModel(String path, String charset, String wordType, int n, int uknownWordFreq, String sPath) throws IOException {
-     long t = System.currentTimeMillis();
-     System.out.println("Start analyzing...");
-
-     nGram = n;
-     ArrayList<String> prevs = new ArrayList<String>();
-     File file = new File(path);
-     Scanner scanner = new Scanner(file, charset);
-     while (scanner.hasNext()) {
-     String str = scanToken(scanner, wordType);
-     if (!str.equals("")) {
-     amount++;
-     String key = "";
-     for (String word : prevs) {
-     key += word;
-     }
-     if (wordCount.containsKey(key)) {
-     wordCount.put(key, wordCount.get(key) + 1);
-     } else {
-     wordCount.put(key, 1);
-     }
-     if (modelTable.getModelTable().containsKey(key)) {
-     boolean isContaining = false;
-     ArrayList<Word> keyArrayList = modelTable.getModelTable().get(key);
-     for (int i = 0; i < keyArrayList.size(); i++) {
-     Word word = keyArrayList.get(i);
-     if (word.getWord().equals(str)) {
-     isContaining = true;
-     word.setAmount(word.getAmount() + 1);
-     }
-     }
-     if (!isContaining) {
-     keyArrayList.add(new Word(str, 1));
-     }
-     } else {
-     ArrayList<Word> wordArrayList = new ArrayList<Word>();
-     wordArrayList.add(new Word(str, 1));
-     modelTable.getModelTable().put(key, wordArrayList);
-     }
-     }
-     prevs.add(str);
-     if (prevs.size() > nGram - 1) {
-     prevs.remove(0);
-     }
-     if (amount % 10000 == 0) {
-     if (amount % 100000 == 0) {
-     System.out.println(".");
-     } else {
-     System.out.print(".");
-     }
-     }
-     }
-     removeRareWords(uknownWordFreq);
-
-     System.out.print("Build model worktime: ");
-     System.out.print((System.currentTimeMillis() - t));
-     System.out.println(" ms.");
-
-     modelTable.saveModelToFile(sPath);
-     }*/
     private void removeRareWords(int freq) {
         for (String key : wordCount.keySet()) {
             if (wordCount.get(key) < freq) {
@@ -305,7 +230,7 @@ public class Separator {
         }
     }
 
-    private String scanToken(Scanner scanner, String wordType) {
+    /*private String scanToken(Scanner scanner, String wordType) {
         String str = "";
         if (wordType.equals("surface_all")) {
             str = scanner.next();
@@ -321,7 +246,7 @@ public class Separator {
             }
         }
         return str;
-    }
+    }*/
 
     public String insertWord(String string) {
         Scanner scanner = new Scanner(string);
@@ -358,11 +283,6 @@ public class Separator {
         }
 
         return string;
-    }
-
-    public String sentenceGeneration(String sPath) throws IOException {
-        // dont inderstand for what do i need in this sPath...  
-        return "bla";
     }
 
     public String getString() {
