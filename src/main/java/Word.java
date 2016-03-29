@@ -54,5 +54,8 @@ public class Word implements Serializable, Comparable{
         }
         return 0;
     }
-
+    @Override
+    public String toString(){
+        return word;
+    }
 }

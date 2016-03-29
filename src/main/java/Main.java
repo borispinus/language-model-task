@@ -11,8 +11,10 @@ public class Main {
         ModelTable test;
         try {
             long t = System.currentTimeMillis();
-            porter.buildModel("/home/boris/corpus.txt", "UTF-8", "surface_no_pm", 3, 0, "/home/boris/model.txt","laplace");
+            ModelTable modelTable =  porter.buildModel("/home/boris/corpus.txt", "UTF-8", "stem", 3, 0, "/home/boris/model.txt");
             System.out.println("Model is built");
+            int n = 0;
+            //System.out.println(modelTable.getModelTable().get("началс").toString());
             porter.insertWords(9,"Серию статей об <SKIP> я начал с <SKIP>");
             System.out.println((System.currentTimeMillis() - t));
         } catch (Exception e) {
