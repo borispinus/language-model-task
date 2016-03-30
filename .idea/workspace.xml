@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="47571e31-5322-47bf-a444-be8fb0bf8bdc" name="Default" comment="Serialization works fine.&#10;It writes model to file and read it from file when it is needed.&#10;&#10;Reworked: &#10;- ModelTable class is for table and all its functions(read/write/new/etc.)">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/Main.class" afterPath="$PROJECT_DIR$/target/classes/Main.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/Separator.class" afterPath="$PROJECT_DIR$/target/classes/Separator.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/Main.java" afterPath="$PROJECT_DIR$/src/main/java/Main.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/Separator.java" afterPath="$PROJECT_DIR$/src/main/java/Separator.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -30,11 +28,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4642857">
-              <caret line="13" column="108" selection-start-line="13" selection-start-column="108" selection-end-line="13" selection-end-column="108" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="13" column="106" selection-start-line="13" selection-start-column="106" selection-end-line="13" selection-end-column="106" />
               <folding />
             </state>
           </provider>
@@ -43,8 +41,8 @@
       <file leaf-file-name="Separator.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/Separator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-4.16129">
-              <caret line="276" column="0" selection-start-line="276" selection-start-column="0" selection-end-line="276" selection-end-column="0" />
+            <state vertical-scroll-proportion="94.3871">
+              <caret line="110" column="27" selection-start-line="110" selection-start-column="27" selection-end-line="110" selection-end-column="27" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
                 <element signature="imports" expanded="true" />
@@ -54,20 +52,20 @@
                 <element signature="e#3490#3491#0" expanded="true" />
                 <element signature="e#3538#3539#0" expanded="true" />
                 <element signature="e#3588#3589#0" expanded="true" />
-                <element signature="e#9786#9794#0" expanded="true" />
-                <element signature="e#11400#11401#0" expanded="true" />
-                <element signature="e#11429#11430#0" expanded="true" />
-                <element signature="e#11473#11474#0" expanded="true" />
-                <element signature="e#11509#11510#0" expanded="true" />
+                <element signature="e#9643#9651#0" expanded="true" />
+                <element signature="e#11352#11353#0" expanded="true" />
+                <element signature="e#11381#11382#0" expanded="true" />
+                <element signature="e#11425#11426#0" expanded="true" />
+                <element signature="e#11461#11462#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ModelTable.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ModelTable.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/ModelTable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
+            <state vertical-scroll-proportion="-0.17857143">
               <caret line="33" column="30" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -80,7 +78,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/Word.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="58" column="20" selection-start-line="58" selection-start-column="20" selection-end-line="58" selection-end-column="20" />
+              <caret line="47" column="4" selection-start-line="47" selection-start-column="4" selection-end-line="47" selection-end-column="4" />
               <folding>
                 <element signature="e#1101#1102#0" expanded="true" />
                 <element signature="e#1128#1129#0" expanded="true" />
@@ -567,7 +565,7 @@
       <workItem from="1458742956343" duration="2654000" />
       <workItem from="1459184634943" duration="28389000" />
       <workItem from="1459277005412" duration="3665000" />
-      <workItem from="1459325157858" duration="17753000" />
+      <workItem from="1459325157858" duration="33278000" />
     </task>
     <task id="LOCAL-00001" summary="Serialization works fine.&#10;It writes model to file and read it from file when it is needed.&#10;&#10;Reworked: &#10;- ModelTable class is for table and all its functions(read/write/new/etc.)">
       <created>1458529942338</created>
@@ -579,7 +577,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="121240000" />
+    <option name="totallyTimeSpent" value="136765000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1301" height="744" extended-state="6" />
@@ -663,11 +661,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -714,11 +712,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -765,11 +763,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -816,11 +814,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -867,11 +865,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -918,11 +916,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -969,11 +967,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1028,11 +1026,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1077,11 +1075,11 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1129,20 +1127,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ModelTable.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/Main.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="33" column="30" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
+          <caret line="13" column="106" selection-start-line="13" selection-start-column="106" selection-end-line="13" selection-end-column="106" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Word.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="47" column="4" selection-start-line="47" selection-start-column="4" selection-end-line="47" selection-end-column="4" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#1101#1102#0" expanded="true" />
+            <element signature="e#1128#1129#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/Separator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.16129">
-          <caret line="276" column="0" selection-start-line="276" selection-start-column="0" selection-end-line="276" selection-end-column="0" />
+        <state vertical-scroll-proportion="94.3871">
+          <caret line="110" column="27" selection-start-line="110" selection-start-column="27" selection-end-line="110" selection-end-column="27" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
             <element signature="imports" expanded="true" />
@@ -1152,31 +1159,22 @@
             <element signature="e#3490#3491#0" expanded="true" />
             <element signature="e#3538#3539#0" expanded="true" />
             <element signature="e#3588#3589#0" expanded="true" />
-            <element signature="e#9786#9794#0" expanded="true" />
-            <element signature="e#11400#11401#0" expanded="true" />
-            <element signature="e#11429#11430#0" expanded="true" />
-            <element signature="e#11473#11474#0" expanded="true" />
-            <element signature="e#11509#11510#0" expanded="true" />
+            <element signature="e#9643#9651#0" expanded="true" />
+            <element signature="e#11352#11353#0" expanded="true" />
+            <element signature="e#11381#11382#0" expanded="true" />
+            <element signature="e#11425#11426#0" expanded="true" />
+            <element signature="e#11461#11462#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Word.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ModelTable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="58" column="20" selection-start-line="58" selection-start-column="20" selection-end-line="58" selection-end-column="20" />
+        <state vertical-scroll-proportion="-0.17857143">
+          <caret line="33" column="30" selection-start-line="33" selection-start-column="30" selection-end-line="33" selection-end-column="30" />
           <folding>
-            <element signature="e#1101#1102#0" expanded="true" />
-            <element signature="e#1128#1129#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4642857">
-          <caret line="13" column="108" selection-start-line="13" selection-start-column="108" selection-end-line="13" selection-end-column="108" />
-          <folding />
         </state>
       </provider>
     </entry>

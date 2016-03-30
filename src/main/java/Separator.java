@@ -108,23 +108,25 @@ public class Separator {
             if (!str.equals("")) {
                 amount++;
                 String sign = "";
-                if (str.matches(".*[?!\\.,:\";'].*")) {
+                if (endFlag) {
                     if (wordType.equals("surface_all")) {
                         sign = String.valueOf(str.charAt(str.length() - 1));
                     } else {
                         sign = SPECIAL_SIGN;
                     }
-                    str = str.replaceAll("[?!\\.,:\";']", "");
 
                 }
+                str = str.replaceAll("[?!\\.,:\";']", "");
+                if (!str.equals("")){
                     String key = buildKey(prevs);
                     addWord(key, str);
                     saveStringForFutureKey(str, prevs);
                     if (endFlag) {
-                        //System.out.println(buildKey(prevs));
                         addWord(buildKey(prevs), sign);
                         saveStringForFutureKey(sign, prevs);
                     }
+                }
+
             }
             printDots();
         }
@@ -216,9 +218,8 @@ public class Separator {
     }
 
     private String scanToken(String str) {
-        if (wordType.equals("surface_no_pm")) {
-            str = removePM(str);
-        } else if (wordType.equals("stem")) {
+        str = str.toLowerCase();
+        if (wordType.equals("stem")) {
             str = stem(removePM(str));
         } else if (wordType.contains("suffix_")) {
             str = removePM(str);
@@ -229,20 +230,17 @@ public class Separator {
         return str;
     }
 
-    public void insertWords(int n, String string) {
+    public String insertWords(int n, String string) {
         ArrayList<String> prevs = new ArrayList<String>();
+        String res = string;
         for (int number = 0; number < n; number++) {
             Scanner scanner = new Scanner(string);
-            String res = string;
+            res = string;
             while (scanner.hasNext()) {
                 String str = scanner.next();
                 str = scanToken(str);
-                if (str.contains("<SKIP>")) {
-                    String key = "";
-                    for (String word : prevs) {
-                        key += word;
-                    }
-                    ArrayList<Word> list = modelTable.getModelTable().get(key);
+                if (str.contains("skip")) {
+                    ArrayList<Word> list = modelTable.getModelTable().get(buildKey(prevs));
                     try {
                         Collections.sort(list);
                         res = res.replaceFirst("<SKIP>", list.get(number).getWord());
@@ -256,14 +254,16 @@ public class Separator {
                     }
                 }
             }
+            System.out.println(res);
         }
+        return res;
     }
 
     public String buildSentence() {
         ArrayList<String> potentialStarts = new ArrayList<String>();
         for (String key : modelTable.getModelTable().keySet()) {
             if (!wordType.equals("surface_all")){
-                if (key.contains(SPECIAL_SIGN)) {
+                if (key.indexOf(SPECIAL_SIGN) == 0) {
                     potentialStarts.add(key);
                 }
             }
@@ -281,7 +281,7 @@ public class Separator {
         sentence = sentence.replaceAll(SPECIAL_SIGN, SPECIAL_SIGN + " ");
         while (!adding.matches("[?!\\.']|"+SPECIAL_SIGN) && n < 15){
             n++;
-           if (n==2){
+           if (n==2 && wordType.equals("surface_all")){
                 sentence = sentence.substring(1);
             }
             String[] tokens = sentence.split(" ");
@@ -304,6 +304,7 @@ public class Separator {
             }
             key = "";
         }
+        sentence = sentence.replaceAll(SPECIAL_SIGN,"");
         System.out.println(sentence);
         return sentence;
     }
