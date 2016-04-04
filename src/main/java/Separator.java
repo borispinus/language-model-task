@@ -26,6 +26,9 @@ public class Separator {
     private static final Pattern NN = Pattern.compile("нн$");
     private ModelTable modelTable = new ModelTable();
     private HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
+    private static final Pattern UNION = Pattern.compile("(и|более|менее|очень|крайне|скоре|некотор|кажд|други|котор|когда|однако|если|чтоб|хот|смотря|кактакже|так|зато|что|или|потом|эт|тог|тоже|словно|ежели|кабы|коли|ничем|чем)$");
+    private static final Pattern PRETEXT = Pattern.compile("(без|близ|благодаря|в|во|для|до|за|из|изо|к|ко|на|о|от|по|ради|со|с|у|через|чрез)$");
+    private static final Pattern PARTICLE = Pattern.compile("(не|ага|аж|бишь|будто|буквально|бы|ведь|вот|вон|вроде|вряд|всё-таки|да|давай|де|дескать|дык|едва|ещё|ж|именно|ладно|конечно|мол|навряд|нет|ни|очевидно|пожалуй|пожалуйста|поди|полноте|якобы|что-то|это|уж|уже|ужели|хоть|хотя|только|так|типа|таки|словно|собственно|спасибо)$");
     private int amount = 0;
     private int nGram = 2;
     private String wordType = "";
@@ -117,7 +120,7 @@ public class Separator {
 
                 }
                 str = str.replaceAll("[?!\\.,:\";']", "");
-                if (!str.equals("")){
+                if (!str.equals("")) {
                     String key = buildKey(prevs);
                     addWord(key, str);
                     saveStringForFutureKey(str, prevs);
@@ -262,12 +265,11 @@ public class Separator {
     public String buildSentence() {
         ArrayList<String> potentialStarts = new ArrayList<String>();
         for (String key : modelTable.getModelTable().keySet()) {
-            if (!wordType.equals("surface_all")){
+            if (!wordType.equals("surface_all")) {
                 if (key.indexOf(SPECIAL_SIGN) == 0) {
                     potentialStarts.add(key);
                 }
-            }
-            else{
+            } else {
                 if (key.length() > 0 && String.valueOf(key.charAt(0)).matches("[?!\\.']")) {
                     potentialStarts.add(key);
                 }
@@ -276,17 +278,17 @@ public class Separator {
         Random random = new Random();
         String sentence = potentialStarts.get(Math.abs(random.nextInt() % potentialStarts.size()));
         String key = "";
-        String adding="";
+        String adding = "";
         int n = 0;
         sentence = sentence.replaceAll(SPECIAL_SIGN, SPECIAL_SIGN + " ");
-        while (!adding.matches("[?!\\.']|"+SPECIAL_SIGN) && n < 15){
+        while (!adding.matches("[?!\\.']|" + SPECIAL_SIGN) && n < 50) {
             n++;
-           if (n==2 && wordType.equals("surface_all")){
+            if (n == 2 && wordType.equals("surface_all")) {
                 sentence = sentence.substring(1);
             }
             String[] tokens = sentence.split(" ");
             int limit = tokens.length - nGram;
-            if (n==1){
+            if (n == 1) {
                 limit++;
             }
             for (int j = tokens.length - 1; j > limit; j--) {
@@ -304,9 +306,227 @@ public class Separator {
             }
             key = "";
         }
-        sentence = sentence.replaceAll(SPECIAL_SIGN,"");
+        sentence = sentence.replaceAll(SPECIAL_SIGN, "");
         System.out.println(sentence);
         return sentence;
+    }
+    private void generateBegins(ArrayList<int[]> list, int pos, int[] sequence, int[] result, boolean[] used) {
+        if (pos == nGram - 1) {
+            list.add(result);
+            return;
+        }
+        for (int i = 0; i < sequence.length; i++) {
+            if (!used[i]) {
+                used[i] = true;
+                result[pos] = sequence[i];
+                generateBegins(list, pos + 1, sequence, result.clone(), used);
+                used[i] = false;
+            }
+        }
+    }
+
+    private String getPartOfSpeech(String word) {
+        word = word.toLowerCase();
+        word = word.replace('ё', 'е');
+        if (UNION.matcher(word).matches()) {
+            return "union";
+        }
+        if (PRETEXT.matcher(word).matches()) {
+            return "pretext";
+        }
+        if (PARTICLE.matcher(word).matches()) {
+            return "particle";
+        }
+        Matcher m = RVRE.matcher(word);
+        if (m.matches()) {
+            String pre = m.group(1);
+            String rv = m.group(2);
+            String temp = PERFECTIVEGROUND.matcher(rv).replaceFirst("");
+            if (temp.equals(rv)) {
+                rv = REFLEXIVE.matcher(rv).replaceFirst("");
+                temp = ADJECTIVE.matcher(rv).replaceFirst("");
+                if (!temp.equals(rv)) {
+                    rv = temp;
+                    rv = PARTICIPLE.matcher(rv).replaceFirst("");
+                    if (!temp.equals(rv)) {
+                        return "participle";
+                    } else {
+                        return "adjective";
+                    }
+                } else {
+                    temp = VERB.matcher(rv).replaceFirst("");
+                    if (temp.equals(rv)) {
+                        return "noun";
+                    } else {
+                        return "verb";
+                    }
+                }
+            } else {
+                return "participle";
+            }
+        }
+        return "unknown";
+    }
+
+    private boolean moreThanUnknown(HashMap<String, Integer> partsStatistics) {
+        for (String partName: partsStatistics.keySet()) {
+            if (!partName.equals("unknown")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String sentenceRecovery(String mixedSentence) {
+        String[] tokens = mixedSentence.split(" ");
+        if (tokens.length < nGram) {
+            return mixedSentence;
+        }
+        int length = tokens.length;
+        String theEnd = "";
+        int theEndIndex = -1;
+        for (int i = 0; i < tokens.length; i++) {
+            if (tokens[i].matches(".*[?!\\.]")) {
+                theEnd = tokens[i];
+                theEndIndex = i;
+                length--;
+
+            }
+        }
+        String[] words = new String[length];
+        int cnt = 0;
+        for (int i = 0; i < tokens.length; i++) {
+            if (i != theEndIndex) {
+                words[cnt++] = tokens[i];
+            }
+        }
+        // assign
+        ArrayList<int[]> sequenceList = new ArrayList<int[]>();
+        int[] initialSequence = new int[words.length];
+        boolean[] used = new boolean[words.length];
+        int[] resultSequence = new int[nGram - 1];
+
+        // init
+        for (int i = 0; i < words.length; i++) {
+            initialSequence[i] = i;
+        }
+        Arrays.fill(used, false);
+
+        generateBegins(sequenceList, 0, initialSequence, resultSequence, used);
+
+
+        String sentence = mixedSentence;
+        double maxP = -1.0;
+        HashMap<String, Integer> partsStatistics = new HashMap<String, Integer>();
+
+        // get data about parts of speech of the given sentence
+        ArrayList<String> sentencePartsOfSpeech = new ArrayList<String>();
+        for (int i = 0; i < words.length; i++) {
+            String partName = getPartOfSpeech(removePM(words[i]));
+            sentencePartsOfSpeech.add(partName);
+        }
+
+        // try any begin of the possible sentence
+        for (int[] begin: sequenceList) {
+            // init
+            ArrayList<
+                    String> prevs = new ArrayList<String>();
+            Arrays.fill(used, false);
+            String tempSentence = "";
+            // begins init
+            for (int i = 0; i < begin.length; i++) {
+                tempSentence += (words[begin[i]] + " ");
+                saveStringForFutureKey(removePM(words[begin[i]]), prevs);
+                used[begin[i]] = true;
+            }
+            // possible sentence building
+            double sequenceP = 0.0;
+            for (int i = nGram - 1; i < words.length; i++) {
+                String key = buildKey(prevs).toLowerCase();
+                double localMaxP = 0.0;
+                String localWord = "";
+                int wordIndex = -1;
+                partsStatistics.clear();
+                boolean wordIsFound = false;
+
+                // if we have experience with this collocation
+                if (wordCount.containsKey(key)) {
+                    ArrayList<Word> list = modelTable.getModelTable().get(key);
+                    // get parts of speech statistics
+                    for (Word word: list) {
+                        String partName = getPartOfSpeech(word.getWord());
+                        if (partsStatistics.containsKey(partName)) {
+                            partsStatistics.put(partName, partsStatistics.get(partName) + 1);
+                        } else {
+                            partsStatistics.put(partName, 1);
+                        }
+                    }
+                    // try to find the most probable word
+                    for (int j = 0; j < words.length; j++) {
+                        if (!used[j]) {
+                            for (Word word: list) {
+                                if (removePM(words[j]).equalsIgnoreCase(word.getWord())) {
+                                    double wordP = word.getP();
+                                    if (Double.compare(word.getP(), localMaxP) > 0) {
+                                        localMaxP = word.getP();
+                                        localWord = words[j];
+                                        wordIndex = j;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // if we found its
+                    if (wordIndex > -1) {
+                        used[wordIndex] = true;
+                        wordIsFound = true;
+                    }
+                    else if (moreThanUnknown(partsStatistics)) {
+                        int theMostStatisticPart = 0;
+                        String partName = "unknown";
+                        for (String speechPart: partsStatistics.keySet()) {
+                            if (!speechPart.equals("unknown") && partsStatistics.get(speechPart) > theMostStatisticPart) {
+                                theMostStatisticPart = partsStatistics.get(speechPart);
+                                partName = speechPart;
+                            }
+                        }
+                        if (!partName.equals("unknown")) {
+                            for (int j = 0; j < words.length; j++) {
+                                if (!used[j] && partName.equals(sentencePartsOfSpeech.get(j))) {
+                                    localMaxP = 0.0004;
+                                    localWord = words[j];
+                                    used[j] = true;
+                                    wordIsFound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!wordIsFound) {
+                    for (int j = 0; j < words.length; j++) {
+                        if (!used[j]) {
+                            localWord = words[j];
+                            used[j] = true;
+                            break;
+                        }
+                    }
+                }
+                sequenceP += localMaxP;
+                tempSentence += (localWord + " ");
+                saveStringForFutureKey(localWord, prevs);
+            }
+
+
+            if (Double.compare(sequenceP, maxP) > 0) {
+                maxP = sequenceP;
+                sentence = tempSentence;
+            }
+        }
+
+        System.out.println(sentence + theEnd);
+        return sentence + theEnd;
     }
 
     public String getString() {
