@@ -102,10 +102,15 @@ public class Separator {
         Scanner scanner = new Scanner(file, charset);
         while (scanner.hasNext()) {
             boolean endFlag = false;
+            boolean signFlag = false;
             String str = scanner.next();
             if (str.matches(".*[?!\\.;'].*")) {
                 amount++;
                 endFlag = true;
+            }
+            if (str.matches(".*[:,].*")){
+                amount++;
+                signFlag = true;
             }
             str = scanToken(str);
             if (!str.equals("")) {
@@ -118,13 +123,15 @@ public class Separator {
                         sign = SPECIAL_SIGN;
                     }
 
+                } else if (signFlag && wordType.equals("surface_all")){
+                    sign = String.valueOf(str.charAt(str.length() - 1));
                 }
                 str = str.replaceAll("[?!\\.,:\";']", "");
                 if (!str.equals("")) {
                     String key = buildKey(prevs);
                     addWord(key, str);
                     saveStringForFutureKey(str, prevs);
-                    if (endFlag) {
+                    if (endFlag || (wordType.equals("surface_all") && signFlag)) {
                         addWord(buildKey(prevs), sign);
                         saveStringForFutureKey(sign, prevs);
                     }
@@ -159,6 +166,9 @@ public class Separator {
         String key = "";
         for (String word : prevs) {
             key += word;
+            key+=" ";
+        }if (prevs.size()!=0){
+            key = key.substring(0, key.length() - 1);
         }
         return key;
     }
@@ -266,21 +276,23 @@ public class Separator {
         ArrayList<String> potentialStarts = new ArrayList<String>();
         for (String key : modelTable.getModelTable().keySet()) {
             if (!wordType.equals("surface_all")) {
-                if (key.indexOf(SPECIAL_SIGN) == 0) {
+                if (key.indexOf(SPECIAL_SIGN) == 0 ) {
                     potentialStarts.add(key);
                 }
-            } else {
-                if (key.length() > 0 && String.valueOf(key.charAt(0)).matches("[?!\\.']")) {
-                    potentialStarts.add(key);
+                else if (nGram == 2){
+                    potentialStarts.add(SPECIAL_SIGN);
                 }
+            } else if (key.length() > 0 && String.valueOf(key.charAt(0)).matches("[?!\\.']")) {
+                    potentialStarts.add(key);
             }
         }
+        //System.out.println("size = " + potentialStarts.size());
         Random random = new Random();
-        String sentence = potentialStarts.get(Math.abs(random.nextInt() % potentialStarts.size()));
+        String sentence ="";
+        sentence = potentialStarts.get(Math.abs(random.nextInt() % potentialStarts.size()));
         String key = "";
         String adding = "";
         int n = 0;
-        sentence = sentence.replaceAll(SPECIAL_SIGN, SPECIAL_SIGN + " ");
         while (!adding.matches("[?!\\.']|" + SPECIAL_SIGN) && n < 50) {
             n++;
             if (n == 2 && wordType.equals("surface_all")) {
@@ -288,17 +300,26 @@ public class Separator {
             }
             String[] tokens = sentence.split(" ");
             int limit = tokens.length - nGram;
-            if (n == 1) {
-                limit++;
+            int k = 0;
+            for (int j = tokens.length - 1; j >= limit; j--) {
+                k++;
+                if (j >= 0 &&  k< nGram){
+                    key = tokens[j]+ " " + key;
+                }
             }
-            for (int j = tokens.length - 1; j > limit; j--) {
-                key = tokens[j] + key;
-            }
+            key = key.substring(0, key.length()-1);
             ArrayList<Word> list = modelTable.getModelTable().get(key);
             try {
+                //System.out.println("key =" + key);
                 Collections.sort(list);
                 sentence += " ";
-                adding = list.get(0).getWord();
+                if (n < 4 && list.size() > 1){
+                    adding = generateAdding(list);
+                }
+                else{
+                    adding = list.get(0).getWord();
+                }
+
                 sentence += adding;
 
             } catch (Exception e) {
@@ -307,8 +328,21 @@ public class Separator {
             key = "";
         }
         sentence = sentence.replaceAll(SPECIAL_SIGN, "");
+        sentence = String.valueOf(sentence.charAt(1)).toUpperCase() + sentence.substring(2);
         System.out.println(sentence);
+        //System.out.println("adding = " + adding);
         return sentence;
+    }
+
+    private String generateAdding(ArrayList<Word> list){
+        Random random = new Random();
+        String adding = list.get(Math.abs(random.nextInt() % list.size())).getWord();
+        if (!adding.equals(SPECIAL_SIGN)){
+            return adding;
+        }
+        else {
+            return generateAdding(list);
+        }
     }
     private void generateBegins(ArrayList<int[]> list, int pos, int[] sequence, int[] result, boolean[] used) {
         if (pos == nGram - 1) {

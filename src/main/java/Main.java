@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 
 /**
@@ -11,14 +12,16 @@ public class Main {
         ModelTable test;
         try {
             long t = System.currentTimeMillis();
-            ModelTable modelTable =  porter.buildModel("/home/boris/corpus.txt", "UTF-8", "surface_no_pm", 3, 0, "/home/boris/model.txt");
+            ModelTable modelTable =  porter.buildModel("/home/boris/corpus.txt", "UTF-8", "stem", 3, 0, "/home/boris/model.txt");
             System.out.println("Model is built");
             int n = 0;
+            //for (String key: modelTable.getModelTable().keySet()){
+              //  System.out.println(key);
+            //}
 
 
-            //porter.insertWords(4, "я очень <SKIP>, давно не <SKIP>");
+            porter.insertWords(4, "я очень <SKIP>, давно не <SKIP>");
             //porter.buildSentence();
-            porter.sentenceRecovery("очень придумать сложно предложение мне");
             System.out.println((System.currentTimeMillis() - t));
         } catch (Exception e) {
             e.printStackTrace();
