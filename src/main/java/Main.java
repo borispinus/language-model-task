@@ -8,20 +8,15 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        Separator porter = new Separator();
-        ModelTable test;
         try {
+            //ModelTable test = new ModelTable("/home/boris/model.txt");
+            Separator porter = new Separator(new ModelTable("/home/boris/model.txt"));
             long t = System.currentTimeMillis();
-            ModelTable modelTable =  porter.buildModel("/home/boris/corpus.txt", "UTF-8", "stem", 3, 0, "/home/boris/model.txt");
+           // ModelTable modelTable = porter.buildModel("/home/boris/corpus.txt", "UTF-8", "surface_all", 2, 0, "/home/boris/model.txt", "laplace");
             System.out.println("Model is built");
-            int n = 0;
-            //for (String key: modelTable.getModelTable().keySet()){
-              //  System.out.println(key);
-            //}
-
-
-            porter.insertWords(4, "я очень <SKIP>, давно не <SKIP>");
-            //porter.buildSentence();
+            //porter.insertWords(4, "я очень <SKIP>, давно не <SKIP>");
+            porter.buildSentence();
+            //porter.sentenceRecovery("на вернула задержанного украину россия человека");
             System.out.println((System.currentTimeMillis() - t));
         } catch (Exception e) {
             e.printStackTrace();

@@ -25,14 +25,17 @@ public class Separator {
     private static final Pattern P = Pattern.compile("ь$");
     private static final Pattern NN = Pattern.compile("нн$");
     private ModelTable modelTable = new ModelTable();
-    private HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
     private static final Pattern UNION = Pattern.compile("(и|более|менее|очень|крайне|скоре|некотор|кажд|други|котор|когда|однако|если|чтоб|хот|смотря|кактакже|так|зато|что|или|потом|эт|тог|тоже|словно|ежели|кабы|коли|ничем|чем)$");
     private static final Pattern PRETEXT = Pattern.compile("(без|близ|благодаря|в|во|для|до|за|из|изо|к|ко|на|о|от|по|ради|со|с|у|через|чрез)$");
     private static final Pattern PARTICLE = Pattern.compile("(не|ага|аж|бишь|будто|буквально|бы|ведь|вот|вон|вроде|вряд|всё-таки|да|давай|де|дескать|дык|едва|ещё|ж|именно|ладно|конечно|мол|навряд|нет|ни|очевидно|пожалуй|пожалуйста|поди|полноте|якобы|что-то|это|уж|уже|ужели|хоть|хотя|только|так|типа|таки|словно|собственно|спасибо)$");
-    private int amount = 0;
-    private int nGram = 2;
-    private String wordType = "";
     private String string;
+
+    public Separator(ModelTable modelTable) {
+        this.modelTable = modelTable;
+    }
+    public Separator(){
+
+    }
 
     public String stem(String word) {
         word = word.toLowerCase();
@@ -95,8 +98,8 @@ public class Separator {
 
         long t = System.currentTimeMillis();
         System.out.println("Start analyzing...");
-        this.wordType = wordType;
-        nGram = n;
+        modelTable.setWordType(wordType);
+        modelTable.setnGram(n);
         ArrayList<String> prevs = new ArrayList<String>();
         File file = new File(path);
         Scanner scanner = new Scanner(file, charset);
@@ -105,16 +108,13 @@ public class Separator {
             boolean signFlag = false;
             String str = scanner.next();
             if (str.matches(".*[?!\\.;'].*")) {
-                amount++;
                 endFlag = true;
             }
-            if (str.matches(".*[:,].*")){
-                amount++;
+            if (str.matches(".*[:,].*")) {
                 signFlag = true;
             }
             str = scanToken(str);
             if (!str.equals("")) {
-                amount++;
                 String sign = "";
                 if (endFlag) {
                     if (wordType.equals("surface_all")) {
@@ -123,7 +123,7 @@ public class Separator {
                         sign = SPECIAL_SIGN;
                     }
 
-                } else if (signFlag && wordType.equals("surface_all")){
+                } else if (signFlag && wordType.equals("surface_all")) {
                     sign = String.valueOf(str.charAt(str.length() - 1));
                 }
                 str = str.replaceAll("[?!\\.,:\";']", "");
@@ -138,19 +138,17 @@ public class Separator {
                 }
 
             }
-            printDots();
         }
         String sm = smoothing.length > 0 ? smoothing[0] : "";
         countP(sm);
-        removeRareWords(unknownWordFreq);
         printInfo(t);
 
-        //modelTable.saveModelToFile(sPath);
+        modelTable.saveModelToFile(sPath);
         return modelTable;
     }
 
     private void saveStringForFutureKey(String str, ArrayList<String> prevs) {
-        if (prevs.size() >= nGram - 1) {
+        if (prevs.size() >= modelTable.getnGram() - 1) {
             prevs.remove(0);
         }
         prevs.add(str);
@@ -166,18 +164,19 @@ public class Separator {
         String key = "";
         for (String word : prevs) {
             key += word;
-            key+=" ";
-        }if (prevs.size()!=0){
+            key += " ";
+        }
+        if (prevs.size() != 0) {
             key = key.substring(0, key.length() - 1);
         }
         return key;
     }
 
     private void addWord(String key, String str) {
-        if (wordCount.containsKey(key)) {
-            wordCount.put(key, wordCount.get(key) + 1);
+        if (modelTable.getWordCount().containsKey(key)) {
+            modelTable.getWordCount().put(key, modelTable.getWordCount().get(key) + 1);
         } else {
-            wordCount.put(key, 1);
+            modelTable.getWordCount().put(key, 1);
         }
         if (modelTable.getModelTable().containsKey(key)) {
             boolean isContaining = false;
@@ -203,40 +202,21 @@ public class Separator {
         for (String key : modelTable.getModelTable().keySet()) {
             for (Word word : modelTable.getModelTable().get(key)) {
                 if (smoothing.equals("laplace")) {
-                    word.setP((double) (word.getAmount() + 1) / (wordCount.get(key) + wordCount.size()));
+                    word.setP((double) (word.getAmount() + 1) / (modelTable.getWordCount().get(key) + modelTable.getWordCount().size()));
                 } else {
-                    word.setP((double) word.getAmount() / wordCount.get(key));
+                    word.setP((double) word.getAmount() / modelTable.getWordCount().get(key));
                 }
-            }
-        }
-    }
-
-    private void printDots() {
-        if (amount % 10000 == 0) {
-            if (amount % 100000 == 0) {
-                System.out.println(".");
-            } else {
-                System.out.print(".");
-            }
-        }
-    }
-
-    private void removeRareWords(int freq) {
-        for (String key : wordCount.keySet()) {
-            if (wordCount.get(key) < freq) {
-                wordCount.remove(key);
-                modelTable.getModelTable().remove(key);
             }
         }
     }
 
     private String scanToken(String str) {
         str = str.toLowerCase();
-        if (wordType.equals("stem")) {
+        if (modelTable.getWordType().equals("stem")) {
             str = stem(removePM(str));
-        } else if (wordType.contains("suffix_")) {
+        } else if (modelTable.getWordType().contains("suffix_")) {
             str = removePM(str);
-            int suffixLength = Integer.parseInt(wordType.substring(1 + wordType.indexOf(("_"))));
+            int suffixLength = Integer.parseInt(modelTable.getWordType().substring(1 + modelTable.getWordType().indexOf(("_"))));
             if (str.length() >= suffixLength)
                 str = str.substring(str.length() - suffixLength);
         }
@@ -262,7 +242,7 @@ public class Separator {
                     }
                 } else {
                     prevs.add(str);
-                    if (prevs.size() > nGram - 1) {
+                    if (prevs.size() > modelTable.getnGram() - 1) {
                         prevs.remove(0);
                     }
                 }
@@ -275,52 +255,46 @@ public class Separator {
     public String buildSentence() {
         ArrayList<String> potentialStarts = new ArrayList<String>();
         for (String key : modelTable.getModelTable().keySet()) {
-            if (!wordType.equals("surface_all")) {
-                if (key.indexOf(SPECIAL_SIGN) == 0 ) {
+            if (!modelTable.getWordType().equals("surface_all")) {
+                if (key.indexOf(SPECIAL_SIGN) == 0) {
                     potentialStarts.add(key);
-                }
-                else if (nGram == 2){
+                } else if (modelTable.getnGram() == 2) {
                     potentialStarts.add(SPECIAL_SIGN);
                 }
             } else if (key.length() > 0 && String.valueOf(key.charAt(0)).matches("[?!\\.']")) {
-                    potentialStarts.add(key);
+                potentialStarts.add(key);
             }
         }
         //System.out.println("size = " + potentialStarts.size());
         Random random = new Random();
-        String sentence ="";
+        String sentence = "";
         sentence = potentialStarts.get(Math.abs(random.nextInt() % potentialStarts.size()));
         String key = "";
         String adding = "";
         int n = 0;
         while (!adding.matches("[?!\\.']|" + SPECIAL_SIGN) && n < 50) {
             n++;
-            if (n == 2 && wordType.equals("surface_all")) {
-                sentence = sentence.substring(1);
-            }
             String[] tokens = sentence.split(" ");
-            int limit = tokens.length - nGram;
+            int limit = tokens.length - modelTable.getnGram();
             int k = 0;
             for (int j = tokens.length - 1; j >= limit; j--) {
                 k++;
-                if (j >= 0 &&  k< nGram){
-                    key = tokens[j]+ " " + key;
+                if (j >= 0 && k < modelTable.getnGram()) {
+                    key = tokens[j] + " " + key;
                 }
             }
-            key = key.substring(0, key.length()-1);
+            if (key.contains(" ")){
+                key = key.substring(0, key.length() - 1);
+            }
             ArrayList<Word> list = modelTable.getModelTable().get(key);
             try {
                 //System.out.println("key =" + key);
-                Collections.sort(list);
-                sentence += " ";
-                if (n < 4 && list.size() > 1){
-                    adding = generateAdding(list);
-                }
-                else{
-                    adding = list.get(0).getWord();
-                }
 
-                sentence += adding;
+                adding = generateAdding(list);
+                if (!adding.equals("")){
+                    sentence += " ";
+                    sentence += adding;
+                }
 
             } catch (Exception e) {
 
@@ -328,24 +302,33 @@ public class Separator {
             key = "";
         }
         sentence = sentence.replaceAll(SPECIAL_SIGN, "");
-        sentence = String.valueOf(sentence.charAt(1)).toUpperCase() + sentence.substring(2);
+        if (modelTable.getWordType().equals("surface_all")) {
+            sentence = sentence.substring(2);
+        }
+        sentence = String.valueOf(sentence.charAt(0)).toUpperCase() + sentence.substring(1);
         System.out.println(sentence);
         //System.out.println("adding = " + adding);
         return sentence;
     }
 
-    private String generateAdding(ArrayList<Word> list){
+    private String generateAdding(ArrayList<Word> list) {
+        Collections.sort(list);
+        ArrayList<Integer> structure = new ArrayList<Integer>();
+        double base = list.get(list.size()-1).getP();
+        for (int i = 0; i< list.size(); i++){
+            for (int j = 0; j < (int) (list.get(i).getP()/base); j++){
+                if (!list.get(i).getWord().matches("\\s*")){
+                    structure.add(i);
+                }
+            }
+        }
         Random random = new Random();
-        String adding = list.get(Math.abs(random.nextInt() % list.size())).getWord();
-        if (!adding.equals(SPECIAL_SIGN)){
-            return adding;
-        }
-        else {
-            return generateAdding(list);
-        }
+        String adding = list.get(Math.abs(random.nextInt() % structure.size())).getWord();
+        return adding.replaceAll("\\s","");
     }
+
     private void generateBegins(ArrayList<int[]> list, int pos, int[] sequence, int[] result, boolean[] used) {
-        if (pos == nGram - 1) {
+        if (pos == modelTable.getnGram() - 1) {
             list.add(result);
             return;
         }
@@ -403,7 +386,7 @@ public class Separator {
     }
 
     private boolean moreThanUnknown(HashMap<String, Integer> partsStatistics) {
-        for (String partName: partsStatistics.keySet()) {
+        for (String partName : partsStatistics.keySet()) {
             if (!partName.equals("unknown")) {
                 return true;
             }
@@ -413,7 +396,7 @@ public class Separator {
 
     public String sentenceRecovery(String mixedSentence) {
         String[] tokens = mixedSentence.split(" ");
-        if (tokens.length < nGram) {
+        if (tokens.length < modelTable.getnGram()) {
             return mixedSentence;
         }
         int length = tokens.length;
@@ -438,7 +421,7 @@ public class Separator {
         ArrayList<int[]> sequenceList = new ArrayList<int[]>();
         int[] initialSequence = new int[words.length];
         boolean[] used = new boolean[words.length];
-        int[] resultSequence = new int[nGram - 1];
+        int[] resultSequence = new int[modelTable.getnGram() - 1];
 
         // init
         for (int i = 0; i < words.length; i++) {
@@ -461,7 +444,7 @@ public class Separator {
         }
 
         // try any begin of the possible sentence
-        for (int[] begin: sequenceList) {
+        for (int[] begin : sequenceList) {
             // init
             ArrayList<
                     String> prevs = new ArrayList<String>();
@@ -475,7 +458,7 @@ public class Separator {
             }
             // possible sentence building
             double sequenceP = 0.0;
-            for (int i = nGram - 1; i < words.length; i++) {
+            for (int i = modelTable.getnGram() - 1; i < words.length; i++) {
                 String key = buildKey(prevs).toLowerCase();
                 double localMaxP = 0.0;
                 String localWord = "";
@@ -484,10 +467,10 @@ public class Separator {
                 boolean wordIsFound = false;
 
                 // if we have experience with this collocation
-                if (wordCount.containsKey(key)) {
+                if (modelTable.getWordCount().containsKey(key)) {
                     ArrayList<Word> list = modelTable.getModelTable().get(key);
                     // get parts of speech statistics
-                    for (Word word: list) {
+                    for (Word word : list) {
                         String partName = getPartOfSpeech(word.getWord());
                         if (partsStatistics.containsKey(partName)) {
                             partsStatistics.put(partName, partsStatistics.get(partName) + 1);
@@ -498,7 +481,7 @@ public class Separator {
                     // try to find the most probable word
                     for (int j = 0; j < words.length; j++) {
                         if (!used[j]) {
-                            for (Word word: list) {
+                            for (Word word : list) {
                                 if (removePM(words[j]).equalsIgnoreCase(word.getWord())) {
                                     double wordP = word.getP();
                                     if (Double.compare(word.getP(), localMaxP) > 0) {
@@ -515,11 +498,10 @@ public class Separator {
                     if (wordIndex > -1) {
                         used[wordIndex] = true;
                         wordIsFound = true;
-                    }
-                    else if (moreThanUnknown(partsStatistics)) {
+                    } else if (moreThanUnknown(partsStatistics)) {
                         int theMostStatisticPart = 0;
                         String partName = "unknown";
-                        for (String speechPart: partsStatistics.keySet()) {
+                        for (String speechPart : partsStatistics.keySet()) {
                             if (!speechPart.equals("unknown") && partsStatistics.get(speechPart) > theMostStatisticPart) {
                                 theMostStatisticPart = partsStatistics.get(speechPart);
                                 partName = speechPart;

@@ -8,6 +8,21 @@ import java.util.Set;
  */
 public class ModelTable implements Serializable {
     private HashMap<String, ArrayList<Word>> modelTable;
+    private HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
+    private int nGram = 2;
+    private String wordType = "";
+
+    public int getnGram() {
+        return nGram;
+    }
+
+    public String getWordType() {
+        return wordType;
+    }
+
+    public HashMap<String, Integer> getWordCount() {
+        return wordCount;
+    }
 
     public ModelTable(HashMap<String, ArrayList<Word>> modelTable) {
         this.modelTable = modelTable;
@@ -19,6 +34,10 @@ public class ModelTable implements Serializable {
 
     public ModelTable(String sPath) throws IOException, ClassNotFoundException {
         this.modelTable = readModelFromFile(sPath).getModelTable();
+        this.wordCount = readModelFromFile(sPath).getWordCount();
+        this.nGram = readModelFromFile(sPath).getnGram();
+        this.wordType = readModelFromFile(sPath).getWordType();
+
     }
 
     private ModelTable readModelFromFile(String sPath) throws IOException, ClassNotFoundException {
@@ -34,6 +53,18 @@ public class ModelTable implements Serializable {
         oos.writeObject(this);
         oos.flush();
         oos.close();
+    }
+
+    public void setWordType(String wordType) {
+        this.wordType = wordType;
+    }
+
+    public void setnGram(int nGram) {
+        this.nGram = nGram;
+    }
+
+    public void setWordCount(HashMap<String, Integer> wordCount) {
+        this.wordCount = wordCount;
     }
 
     @Override
