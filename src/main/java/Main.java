@@ -14,8 +14,8 @@ public class Main {
             long t = System.currentTimeMillis();
            // ModelTable modelTable = porter.buildModel("/home/boris/corpus.txt", "UTF-8", "surface_all", 2, 0, "/home/boris/model.txt", "laplace");
             System.out.println("Model is built");
-            //porter.insertWords(4, "я очень <SKIP>, давно не <SKIP>");
-            porter.buildSentence();
+            porter.insertWords(4, "я очень <SKIP> его но <SKIP> больше <SKIP>");
+            //porter.buildSentence();
             //porter.sentenceRecovery("на вернула задержанного украину россия человека");
             System.out.println((System.currentTimeMillis() - t));
         } catch (Exception e) {

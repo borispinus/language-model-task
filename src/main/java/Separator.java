@@ -33,9 +33,11 @@ public class Separator {
     public Separator(ModelTable modelTable) {
         this.modelTable = modelTable;
     }
-    public Separator(){
+
+    public Separator() {
 
     }
+
 
     public String stem(String word) {
         word = word.toLowerCase();
@@ -87,10 +89,6 @@ public class Separator {
 
     private String removePM(String word) {
         return word.replaceAll("[^\\p{L}]", "");
-    }
-
-    private String removeSpaces(String word) {
-        return word.replaceAll("\\s", " ");
     }
 
 
@@ -223,28 +221,82 @@ public class Separator {
         return str;
     }
 
+    private  <K,V extends Comparable<? super V>>
+    SortedSet<Map.Entry<K,V>> entriesSortedByValues(Map<K,V> map) {
+        SortedSet<Map.Entry<K,V>> sortedEntries = new TreeSet<Map.Entry<K,V>>(
+                new Comparator<Map.Entry<K,V>>() {
+                    public int compare(Map.Entry<K,V> e1, Map.Entry<K,V> e2) {
+                        int res = e2.getValue().compareTo(e1.getValue());
+                        return res != 0 ? res : 1;
+                    }
+                }
+        );
+        sortedEntries.addAll(map.entrySet());
+        return sortedEntries;
+    }
+
     public String insertWords(int n, String string) {
         ArrayList<String> prevs = new ArrayList<String>();
         String res = string;
         for (int number = 0; number < n; number++) {
             Scanner scanner = new Scanner(string);
             res = string;
+            boolean skipFlag = false;
+            ArrayList<Word> beforeList = null;
             while (scanner.hasNext()) {
                 String str = scanner.next();
                 str = scanToken(str);
-                if (str.contains("skip")) {
-                    ArrayList<Word> list = modelTable.getModelTable().get(buildKey(prevs));
+                if (skipFlag) {
+                    skipFlag = false;
                     try {
-                        Collections.sort(list);
-                        res = res.replaceFirst("<SKIP>", list.get(number).getWord());
+                        prevs.remove(0);
+                        Collections.sort(beforeList);
+                        TreeMap<String, Double> inserts = new TreeMap<String, Double>();
+                        for (int i = 0; i < beforeList.size(); i++) {
+                            String key = buildKey(prevs).equals("") ? beforeList.get(i).getWord() : buildKey(prevs) + " "
+                                    + beforeList.get(i).getWord();
+                            for (Word word : modelTable.getModelTable().get(key)) {
+                                if (str.equals(word.getWord())) {
+                                    inserts.put(beforeList.get(i).getWord(), word.getP() * beforeList.get(i).getP());
+                                }
+                            }
+                        }
+                        SortedSet<Map.Entry<String,Double>> entrySortedSet= entriesSortedByValues(inserts);
+
+                        Iterator<Map.Entry<String,Double>>  iterator = entrySortedSet.iterator();
+                        int k = 0;
+                        String key = "";
+                        double p = 0;
+                        while(number >= k) {
+
+                            Map.Entry<String, Double> entry = iterator.next();
+                            key = entry.getKey();
+                            k++;
+                        }
+                        res = res.replaceFirst("<SKIP>", key);
+                        prevs.add(key);
                     } catch (Exception e) {
                         res = res.replaceFirst("<SKIP>", "<NO MATCHING>");
                     }
+                }
+                if (str.contains("skip")) {
+                    skipFlag = true;
+                    beforeList = modelTable.getModelTable().get(buildKey(prevs));
                 } else {
                     prevs.add(str);
                     if (prevs.size() > modelTable.getnGram() - 1) {
                         prevs.remove(0);
                     }
+                }
+            }
+            if (skipFlag){
+                try{
+                    String j = prevs.get(0);
+                    beforeList =  modelTable.getModelTable().get(buildKey(prevs));
+                    res = res.replaceFirst("<SKIP>", beforeList.get(number).getWord());
+                }
+                catch (Exception e){
+                    res = res.replaceFirst("<SKIP>", "<NO MATCHING>");
                 }
             }
             System.out.println(res);
@@ -283,7 +335,7 @@ public class Separator {
                     key = tokens[j] + " " + key;
                 }
             }
-            if (key.contains(" ")){
+            if (key.contains(" ")) {
                 key = key.substring(0, key.length() - 1);
             }
             ArrayList<Word> list = modelTable.getModelTable().get(key);
@@ -291,7 +343,7 @@ public class Separator {
                 //System.out.println("key =" + key);
 
                 adding = generateAdding(list);
-                if (!adding.equals("")){
+                if (!adding.equals("")) {
                     sentence += " ";
                     sentence += adding;
                 }
@@ -314,17 +366,17 @@ public class Separator {
     private String generateAdding(ArrayList<Word> list) {
         Collections.sort(list);
         ArrayList<Integer> structure = new ArrayList<Integer>();
-        double base = list.get(list.size()-1).getP();
-        for (int i = 0; i< list.size(); i++){
-            for (int j = 0; j < (int) (list.get(i).getP()/base); j++){
-                if (!list.get(i).getWord().matches("\\s*")){
+        double base = list.get(list.size() - 1).getP();
+        for (int i = 0; i < list.size(); i++) {
+            for (int j = 0; j < (int) (list.get(i).getP() / base); j++) {
+                if (!list.get(i).getWord().matches("\\s*")) {
                     structure.add(i);
                 }
             }
         }
         Random random = new Random();
         String adding = list.get(Math.abs(random.nextInt() % structure.size())).getWord();
-        return adding.replaceAll("\\s","");
+        return adding.replaceAll("\\s", "");
     }
 
     private void generateBegins(ArrayList<int[]> list, int pos, int[] sequence, int[] result, boolean[] used) {
