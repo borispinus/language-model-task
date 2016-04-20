@@ -9,6 +9,7 @@ import java.util.Set;
 public class ModelTable implements Serializable {
     private HashMap<String, ArrayList<Word>> modelTable;
     private HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
+    public static final String SPECIAL_SIGN = "SPECIAL_SIGN";
     private int nGram = 2;
     private String wordType = "";
 
